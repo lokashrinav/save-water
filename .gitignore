@@ -32,15 +32,19 @@ env/
 *.swp
 *.swo
 
-# Data files (satellite imagery can be large)
+# Large data files (exclude satellite imagery)
 my_data/
+data/
 *.tif
 *.tiff
+*.jp2
+*.hdf
+*.nc
 
 # Logs
 *.log
 
-# Environment variables
+# Environment variables with credentials
 .env
 
 # Pytest
@@ -54,3 +58,9 @@ Thumbs.db
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Temporary files
+*.tmp
+test_ndwi.py
+process_simulation.py
+example_pipeline.geojson
