@@ -6,102 +6,532 @@
     <title>{% block title %}AquaSpot - Pipeline Leak Detection{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #1a1a1a;
+            --secondary-color: #666666;
+            --accent-color: #0066cc;
+            --success-color: #00c851;
+            --warning-color: #ff8800;
+            --danger-color: #ff4444;
+            --background: #fafafa;
+            --surface: #ffffff;
+            --border: #e1e5e9;
+            --border-light: #f1f3f4;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            background: var(--background);
+            font-weight: 400;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .main-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            margin: 2rem auto;
-            max-width: 800px;
+        
+        .header {
+            background: var(--surface);
+            border: 1.37px solid rgba(0, 102, 204, 0.4);
+            padding: 24px 0;
+            position: relative;
         }
-        .header-section {
-            background: linear-gradient(135deg, #4e73df, #1cc88a);
-            color: white;
-            padding: 2rem;
-            border-radius: 15px 15px 0 0;
-            text-align: center;
-        }
-        .upload-section {
-            padding: 2rem;
-        }
-        .file-upload-area {
-            border: 3px dashed #4e73df;
-            border-radius: 10px;
-            padding: 2rem;
-            text-align: center;
-            background: #f8f9fc;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        .file-upload-area:hover {
-            border-color: #1cc88a;
-            background: #f0f8f5;
-        }
-        .file-upload-area.dragover {
-            border-color: #1cc88a;
-            background: #e8f5e8;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #4e73df, #1cc88a);
-            border: none;
-            padding: 12px 30px;
-            border-radius: 25px;
+        
+        .header h1 {
+            font-size: 20px;
             font-weight: 600;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        
+        .header .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: 400;
+        }
+        
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        .main-content {
+            background: var(--surface);
+            border: 1.37px solid rgba(0, 102, 204, 0.4);
+            padding: 32px;
+            margin: 32px 0;
+            position: relative;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        }
+        
+        .main-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: var(--accent-color);
+            opacity: 0.15;
+            border-radius: 0 0 1px 1px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            letter-spacing: -0.01em;
+            position: relative;
+            padding-left: 16px;
+        }
+        
+        .section-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 16px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            opacity: 0.8;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: -0.005em;
+        }
+        
+        .form-control, .form-select {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            color: var(--text-primary);
+            background: var(--surface);
+            transition: all 0.2s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.08);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .file-upload-area {
+            border: 1px dashed var(--border);
+            border-radius: 12px;
+            padding: 48px 24px;
+            text-align: center;
+            background: var(--surface);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 1px solid var(--accent-color);
+            border-radius: 12px;
+            opacity: 0;
             transition: all 0.3s ease;
         }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(78, 115, 223, 0.4);
+        
+        .file-upload-area:hover::before {
+            opacity: 0.1;
         }
-        .feature-icon {
-            font-size: 3rem;
-            color: #4e73df;
-            margin-bottom: 1rem;
+        
+        .file-upload-area:hover {
+            border-color: var(--accent-color);
+            background: #fafbff;
         }
-        .alert {
-            border-radius: 10px;
+        
+        .file-upload-area.dragover {
+            border-color: var(--accent-color);
+            background: #f8f9ff;
+            border-style: solid;
+        }
+        
+        .upload-icon {
+            font-size: 32px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+        
+        .upload-text {
+            font-size: 15px;
+            color: var(--text-primary);
+            font-weight: 500;
+            margin-bottom: 4px;
+            letter-spacing: -0.005em;
+        }
+        
+        .upload-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            text-decoration: none;
             border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            letter-spacing: -0.005em;
         }
-        .form-control, .form-select {
-            border-radius: 10px;
-            border: 2px solid #e3e6f0;
-            padding: 12px 15px;
+        
+        .btn i {
+            margin-right: 8px;
+            font-size: 13px;
         }
-        .form-control:focus, .form-select:focus {
-            border-color: #4e73df;
-            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        
+        .btn-primary {
+            color: white;
+            background: var(--accent-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px 8px 0 0;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            background: #0052a3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.15);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            color: var(--text-primary);
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--background);
+        }
+        
+        .alert {
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-warning {
+            color: #8b4513;
+            background: #fff8e1;
+            border: 1px solid #ffecb3;
+        }
+        
+        .alert-info {
+            color: #1565c0;
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+        }
+        
+        .alert-success {
+            color: #2e7d32;
+            background: #e8f5e8;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .text-muted {
+            color: var(--text-muted);
+        }
+        
+        .row {
+            display: flex;
+            margin: 0 -12px;
+        }
+        
+        .col-md-4 {
+            flex: 0 0 33.333333%;
+            padding: 0 12px;
+        }
+        
+        .col-md-6 {
+            flex: 0 0 50%;
+            padding: 0 12px;
+        }
+        
+        .col-md-8 {
+            flex: 0 0 66.666667%;
+            padding: 0 12px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 16px;
+            }
+            
+            .main-content {
+                padding: 24px;
+                margin: 24px 0;
+            }
+            
+            .col-md-4, .col-md-6, .col-md-8 {
+                flex: 0 0 100%;
+                margin-bottom: 16px;
+            }
+            
+            .file-upload-area {
+                padding: 32px 16px;
+            }
+        }
+        
+        .info-section {
+            background: var(--background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            position: relative;
+        }
+        
+        .info-section::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 4px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            opacity: 0.4;
+        }
+        
+        .info-section h6 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            letter-spacing: -0.005em;
+        }
+        
+        .info-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-section li {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .info-section li:before {
+            content: "•";
+            color: var(--accent-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        small {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 4px;
+        }
+        
+        .d-none {
+            display: none !important;
+        }
+        
+        /* Result page specific styles */
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            height: 100%;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .metric-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-color);
+            border-radius: 0 0 12px 12px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+        
+        .metric-card:hover::after {
+            opacity: 1;
+        }
+        
+        .metric-icon {
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        
+        .metric-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        
+        .process-item {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+        
+        .process-item i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        
+        .status-section {
+            background: var(--background);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .status-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: var(--accent-color);
+            opacity: 0.3;
+            border-radius: 0 0 1px 1px;
+        }
+        
+        .status-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="main-container">
-            <div class="header-section">
-                <h1><i class="fas fa-tint"></i> AquaSpot</h1>
-                <p class="lead mb-0">AI-Powered Pipeline Leak Detection using Satellite Imagery</p>
-            </div>
-            
-            <div class="upload-section">
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        {% for message in messages %}
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                <i class="fas fa-exclamation-triangle"></i> {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-                
-                {% block content %}{% endblock %}
-            </div>
+    <div class="header">
+        <div class="container">
+            <h1>AquaSpot</h1>
+            <p class="subtitle">Pipeline Leak Detection System</p>
         </div>
+    </div>
+    
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        {% block content %}{% endblock %}
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>

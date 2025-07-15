@@ -1,179 +1,102 @@
 {% extends "base.html" %}
 
-{% block title %}Analysis Results - AquaSpot{% endblock %}
-
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="text-center mb-4">
-            <div class="feature-icon text-success">
-                <i class="fas fa-check-circle"></i>
-            </div>
-            <h2 class="text-success">Analysis Complete!</h2>
-            <p class="lead">Your pipeline leak detection analysis has been successfully completed.</p>
-        </div>
-        
-        <!-- Results Summary -->
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-images feature-icon text-primary"></i>
-                        <h5 class="card-title">Satellite Images</h5>
-                        <h3 class="text-primary">{{ num_images }}</h3>
-                        <p class="card-text text-muted">Images processed</p>
-                    </div>
+<div class="main-content">
+    <h2 class="section-title">Analysis Complete</h2>
+    
+    <div class="alert alert-success">
+        Analysis completed successfully. Results are ready for download.
+    </div>
+    
+    <!-- Metrics -->
+    <div class="row" style="margin-bottom: 32px;">
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="metric-icon" style="color: var(--accent-color);">
+                    <i class="fas fa-satellite"></i>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-exclamation-triangle feature-icon text-warning"></i>
-                        <h5 class="card-title">Change Areas</h5>
-                        <h3 class="text-warning">{{ num_changes }}</h3>
-                        <p class="card-text text-muted">Potential leak areas detected</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        {% if report_available %}
-                            <i class="fas fa-file-pdf feature-icon text-success"></i>
-                            <h5 class="card-title">Report Status</h5>
-                            <h3 class="text-success">Ready</h3>
-                            <p class="card-text text-muted">PDF report generated</p>
-                        {% else %}
-                            <i class="fas fa-file-pdf feature-icon text-muted"></i>
-                            <h5 class="card-title">Report Status</h5>
-                            <h3 class="text-muted">Processing</h3>
-                            <p class="card-text text-muted">Report generation in progress</p>
-                        {% endif %}
-                    </div>
-                </div>
+                <div class="metric-value">{{ num_images }}</div>
+                <div class="metric-label">Images Processed</div>
             </div>
         </div>
-        
-        <!-- Analysis Details -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">
-                    <i class="fas fa-clipboard-list"></i> Analysis Details
-                </h5>
-            </div>
-            <div class="card-body">
-                <ul class="list-unstyled mb-0">
-                    <li class="mb-2">
-                        <i class="fas fa-check text-success"></i> 
-                        <strong>Satellite Data Download:</strong> Successfully retrieved {{ num_images }} Sentinel-2 images
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-check text-success"></i> 
-                        <strong>NDWI Calculation:</strong> Normalized Difference Water Index computed for all images
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-check text-success"></i> 
-                        <strong>Pipeline Masking:</strong> Analysis focused on pipeline corridor areas
-                    </li>
-                    {% if num_changes > 0 %}
-                    <li class="mb-2">
-                        <i class="fas fa-exclamation-triangle text-warning"></i> 
-                        <strong>Change Detection:</strong> {{ num_changes }} potential leak areas identified
-                    </li>
-                    {% else %}
-                    <li class="mb-2">
-                        <i class="fas fa-check text-success"></i> 
-                        <strong>Change Detection:</strong> No significant changes detected
-                    </li>
-                    {% endif %}
-                    {% if report_available %}
-                    <li class="mb-0">
-                        <i class="fas fa-check text-success"></i> 
-                        <strong>Report Generation:</strong> PDF report with maps and analysis complete
-                    </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Download Section -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">
-                    <i class="fas fa-download"></i> Download Results
-                </h5>
-            </div>
-            <div class="card-body">
-                <p>Your complete analysis results are available for download as a ZIP package containing:</p>
-                <ul>
-                    <li>Satellite imagery and processed NDWI maps</li>
-                    <li>Change detection visualizations</li>
-                    <li>Comprehensive PDF report with findings</li>
-                    <li>Raw data files for further analysis</li>
-                </ul>
-                
-                <div class="text-center mt-3">
-                    <a href="{{ url_for('download_results', timestamp=timestamp) }}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-download"></i> Download Complete Results
-                    </a>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="metric-icon" style="color: var(--warning-color);">
+                    <i class="fas fa-exclamation-triangle"></i>
                 </div>
+                <div class="metric-value">{{ num_changes }}</div>
+                <div class="metric-label">Areas Detected</div>
             </div>
         </div>
-        
-        <!-- Interpretation Guide -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">
-                    <i class="fas fa-info-circle"></i> How to Interpret Results
-                </h5>
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="metric-icon" style="color: var(--success-color);">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="metric-value">Ready</div>
+                <div class="metric-label">Report Status</div>
             </div>
-            <div class="card-body">
+        </div>
+    </div>
+    
+    <!-- Process Status -->
+    <div class="status-section">
+        <div class="status-title">Processing Pipeline</div>
+        <div class="process-grid">
+            <div class="process-item">
+                <i class="fas fa-check" style="color: var(--success-color);"></i>
+                Satellite data retrieved
+            </div>
+            <div class="process-item">
+                <i class="fas fa-check" style="color: var(--success-color);"></i>
+                NDWI analysis complete
+            </div>
+            <div class="process-item">
+                <i class="fas fa-check" style="color: var(--success-color);"></i>
+                Pipeline masking applied
+            </div>
+            <div class="process-item">
                 {% if num_changes > 0 %}
-                <div class="alert alert-warning">
-                    <h6><i class="fas fa-exclamation-triangle"></i> Potential Leaks Detected</h6>
-                    <p class="mb-0">The analysis identified {{ num_changes }} areas with significant water content changes. These should be investigated further:</p>
-                </div>
-                <ul>
-                    <li><strong>High Priority:</strong> Large, sudden increases in water content near pipeline infrastructure</li>
-                    <li><strong>Medium Priority:</strong> Gradual increases in water content in previously dry areas</li>
-                    <li><strong>Low Priority:</strong> Small changes that may be due to seasonal variations</li>
-                </ul>
+                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                {{ num_changes }} areas identified
                 {% else %}
-                <div class="alert alert-success">
-                    <h6><i class="fas fa-check-circle"></i> No Significant Changes Detected</h6>
-                    <p class="mb-0">The analysis found no significant water content changes along the pipeline corridor during the specified time period.</p>
-                </div>
+                <i class="fas fa-check" style="color: var(--success-color);"></i>
+                No changes detected
                 {% endif %}
-                
-                <h6 class="mt-3">Next Steps:</h6>
-                <ol>
-                    <li>Review the PDF report for detailed maps and analysis</li>
-                    <li>Cross-reference findings with maintenance records</li>
-                    <li>Schedule field inspections for high-priority areas</li>
-                    <li>Consider running analysis for different time periods</li>
-                </ol>
             </div>
         </div>
-        
-        <!-- Actions -->
+    </div>
+    
+    <!-- Download -->
+    <div class="status-section">
+        <div class="status-title">Download Results</div>
+        <p style="color: var(--text-secondary); margin-bottom: 20px;">
+            Complete analysis package including satellite imagery, processed data, and documentation.
+        </p>
         <div class="text-center">
-            <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
-                <i class="fas fa-plus"></i> Run New Analysis
+            <a href="{{ url_for('download_results', timestamp=timestamp) }}" class="btn btn-primary">
+                <i class="fas fa-download"></i>
+                Download Analysis
             </a>
         </div>
     </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-refresh page if report is still processing
-    {% if not report_available %}
-    setTimeout(function() {
-        location.reload();
-    }, 30000); // Refresh every 30 seconds
+    
+    <!-- Status -->
+    {% if num_changes > 0 %}
+    <div class="alert alert-warning">
+        <strong>Areas of Interest:</strong> {{ num_changes }} areas require field investigation.
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <strong>No Significant Changes:</strong> Analysis found no major anomalies during the specified period.
+    </div>
     {% endif %}
-});
-</script>
+    
+    <div class="text-center" style="margin-top: 32px;">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+            <i class="fas fa-plus"></i>
+            New Analysis
+        </a>
+    </div>
+</div>
 {% endblock %}

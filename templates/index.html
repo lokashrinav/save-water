@@ -1,101 +1,74 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <h2 class="text-center mb-4">
-            <i class="fas fa-upload"></i> Upload Pipeline Data for Analysis
-        </h2>
-        
-        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
-            <!-- File Upload Section -->
-            <div class="mb-4">
-                <label for="geojson_file" class="form-label">
-                    <i class="fas fa-map"></i> Pipeline GeoJSON File
-                </label>
-                <div class="file-upload-area" id="fileUploadArea">
-                    <input type="file" name="geojson_file" id="geojson_file" class="d-none" accept=".geojson,.json" required>
-                    <div id="uploadContent">
-                        <i class="fas fa-cloud-upload-alt feature-icon"></i>
-                        <h5>Click to select or drag & drop your GeoJSON file</h5>
-                        <p class="text-muted mb-0">Supported formats: .geojson, .json (Max: 16MB)</p>
+<div class="main-content">
+    <h2 class="section-title">Pipeline Analysis Configuration</h2>
+    
+    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+        <!-- File Upload Section -->
+        <div class="form-group">
+            <label for="geojson_file" class="form-label">Pipeline Geometry File</label>
+            <div class="file-upload-area" id="fileUploadArea">
+                <input type="file" name="geojson_file" id="geojson_file" class="d-none" accept=".geojson,.json" required>
+                <div id="uploadContent">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-upload"></i>
                     </div>
-                    <div id="fileSelected" class="d-none">
-                        <i class="fas fa-file-check feature-icon text-success"></i>
-                        <h5 id="fileName" class="text-success"></h5>
-                        <p class="text-muted mb-0">File ready for upload</p>
+                    <div class="upload-text">Select GeoJSON file or drag and drop</div>
+                    <p class="upload-hint">Supported formats: .geojson, .json (Maximum: 16MB)</p>
+                </div>
+                <div id="fileSelected" class="d-none">
+                    <div class="upload-icon" style="color: var(--success-color);">
+                        <i class="fas fa-check-circle"></i>
                     </div>
+                    <div class="upload-text" id="fileName" style="color: var(--success-color);"></div>
+                    <p class="upload-hint">File ready for processing</p>
                 </div>
             </div>
-            
-            <!-- Date Selection -->
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <label for="target_date" class="form-label">
-                        <i class="fas fa-calendar"></i> Target Date for Analysis
-                    </label>
+        </div>
+        
+        <!-- Analysis Parameters -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="target_date" class="form-label">Analysis Date</label>
                     <input type="date" name="target_date" id="target_date" class="form-control" required>
-                    <div class="form-text">Select the date when you suspect a leak occurred</div>
+                    <small class="text-muted">Date for satellite imagery analysis</small>
                 </div>
-                <div class="col-md-4">
-                    <label for="days_tolerance" class="form-label">
-                        <i class="fas fa-clock"></i> Days Tolerance
-                    </label>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="days_tolerance" class="form-label">Date Tolerance</label>
                     <select name="days_tolerance" id="days_tolerance" class="form-select">
                         <option value="3">3 days</option>
                         <option value="5" selected>5 days</option>
                         <option value="7">7 days</option>
                         <option value="10">10 days</option>
                     </select>
-                    <div class="form-text">Acceptable date range for satellite imagery</div>
+                    <small class="text-muted">Acceptable date range for imagery</small>
                 </div>
             </div>
-            
-            <!-- Analysis Information -->
-            <div class="alert alert-info">
-                <h5><i class="fas fa-info-circle"></i> What happens next?</h5>
-                <ul class="mb-0">
-                    <li>Download Sentinel-2 satellite imagery for your pipeline area</li>
-                    <li>Calculate Normalized Difference Water Index (NDWI)</li>
-                    <li>Apply geospatial masking to focus on pipeline areas</li>
-                    <li>Detect changes that may indicate leaks</li>
-                    <li>Generate comprehensive PDF report with visualizations</li>
-                </ul>
-            </div>
-            
-            <!-- Submit Button -->
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
-                    <i class="fas fa-search"></i> Start Leak Detection Analysis
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="text-center" style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-play"></i> Start Analysis
+            </button>
+        </div>
+    </form>
 </div>
 
-<!-- Features Section -->
-<div class="row mt-5">
-    <div class="col-md-4 text-center mb-4">
-        <div class="feature-icon">
-            <i class="fas fa-satellite"></i>
-        </div>
-        <h5>Satellite Analysis</h5>
-        <p class="text-muted">Uses Sentinel-2 satellite imagery for comprehensive coverage</p>
-    </div>
-    <div class="col-md-4 text-center mb-4">
-        <div class="feature-icon">
-            <i class="fas fa-eye"></i>
-        </div>
-        <h5>Change Detection</h5>
-        <p class="text-muted">Advanced algorithms detect water-related changes over time</p>
-    </div>
-    <div class="col-md-4 text-center mb-4">
-        <div class="feature-icon">
-            <i class="fas fa-file-pdf"></i>
-        </div>
-        <h5>Detailed Reports</h5>
-        <p class="text-muted">Professional PDF reports with maps and analysis results</p>
-    </div>
+<!-- Process Information -->
+<div class="info-section">
+    <h6>Analysis Process</h6>
+    <ul>
+        <li>Download Sentinel-2 satellite imagery for specified area and timeframe</li>
+        <li>Calculate Normalized Difference Water Index (NDWI) from satellite bands</li>
+        <li>Apply geospatial filtering to focus on pipeline corridor areas</li>
+        <li>Perform temporal change detection to identify potential leak signatures</li>
+        <li>Generate comprehensive analysis report with findings and recommendations</li>
+    </ul>
 </div>
 {% endblock %}
 
@@ -126,8 +99,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fileName.textContent = file.name;
             uploadContent.classList.add('d-none');
             fileSelected.classList.remove('d-none');
-            fileUploadArea.style.borderColor = '#1cc88a';
-            fileUploadArea.style.backgroundColor = '#f0f8f5';
         }
     });
     
@@ -154,8 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileName.textContent = file.name;
                 uploadContent.classList.add('d-none');
                 fileSelected.classList.remove('d-none');
-                this.style.borderColor = '#1cc88a';
-                this.style.backgroundColor = '#f0f8f5';
             } else {
                 alert('Please select a GeoJSON or JSON file.');
             }
@@ -166,16 +135,12 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
         submitBtn.disabled = true;
-        
-        // Show processing message
-        const processingAlert = document.createElement('div');
-        processingAlert.className = 'alert alert-warning mt-3';
-        processingAlert.innerHTML = `
-            <i class="fas fa-cog fa-spin"></i> 
-            <strong>Analysis in progress...</strong> This may take several minutes depending on the area size and date range.
-        `;
-        form.appendChild(processingAlert);
     });
+    
+    // Utility classes for d-none
+    const style = document.createElement('style');
+    style.textContent = '.d-none { display: none !important; }';
+    document.head.appendChild(style);
 });
 </script>
 {% endblock %}
