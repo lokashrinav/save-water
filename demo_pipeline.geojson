@@ -1,0 +1,23 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sample Pipeline",
+        "type": "gas_pipeline",
+        "diameter": 24,
+        "material": "steel"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-95.3698, 29.7604],
+          [-95.3595, 29.7504],
+          [-95.3492, 29.7404],
+          [-95.3389, 29.7304]
+        ]
+      }
+    }
+  ]
+}

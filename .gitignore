@@ -68,6 +68,12 @@ verify_pipeline.py
 debug_change.py
 verification_plot.png
 
+# Web interface files
+uploads/
+results/
+instance/
+*.db
+
 # Additional exclusions
 *.png
 *.jpg

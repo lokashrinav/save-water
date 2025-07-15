@@ -1,0 +1,6 @@
+# Web framework dependencies for AquaSpot frontend
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Keep existing AquaSpot dependencies
+# (These should already be in your pyproject.toml)

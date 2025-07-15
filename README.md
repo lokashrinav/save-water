@@ -15,6 +15,22 @@ AquaSpot is a comprehensive system for detecting potential pipeline leaks throug
 - PDF report generation
 - Email and SMS alerts
 - Command-line interface
+- **🌐 Web interface for easy access**
+
+## Quick Start
+
+### Option 1: Web Interface (Recommended for most users)
+
+```bash
+# Start the web interface
+python start_web.py
+```
+
+Then open your browser to `http://localhost:5000` and upload your pipeline GeoJSON file!
+
+See [WEB_README.md](WEB_README.md) for detailed web interface documentation.
+
+### Option 2: Command Line Interface
 
 ## Installation
 
