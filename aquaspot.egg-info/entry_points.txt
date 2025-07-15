@@ -1,0 +1,2 @@
+[console_scripts]
+aquaspot = aquaspot.cli:main

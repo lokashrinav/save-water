@@ -1,0 +1,22 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Main Pipeline Segment",
+        "material": "steel",
+        "diameter_mm": 600,
+        "pressure_bar": 45
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-122.4194, 37.7749],
+          [-122.4094, 37.7849],
+          [-122.3994, 37.7949]
+        ]
+      }
+    }
+  ]
+}
