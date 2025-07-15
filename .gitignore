@@ -59,8 +59,16 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
-# Temporary files
+# Temporary test files (exclude from repo)
 *.tmp
 test_ndwi.py
 process_simulation.py
 example_pipeline.geojson
+verify_pipeline.py
+debug_change.py
+verification_plot.png
+
+# Additional exclusions
+*.png
+*.jpg
+*.jpeg
