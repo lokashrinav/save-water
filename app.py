@@ -1371,7 +1371,7 @@ def create_trend_analysis(output_dir, data):
         f.write("  □ Continue satellite monitoring\n")
         f.write("  □ Seasonal pattern analysis\n")
         f.write("  □ Preventive maintenance scheduling\n")
-               f.write("  □ Technology enhancement evaluation\n\n")
+        f.write("  □ Technology enhancement evaluation\n\n")
 
 def create_maintenance_recommendations(output_dir, data):
     """Create detailed maintenance recommendations."""
