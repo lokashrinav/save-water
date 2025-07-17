@@ -171,16 +171,25 @@ def run_analysis(geojson_path, target_date, days_tolerance):
         })
         
         # Create comprehensive analysis package
-        results_zip = create_comprehensive_results_package(output_dir, timestamp, {
-            'target_date': target_date,
-            'days_tolerance': days_tolerance,
-            'pipeline_file': geojson_path.name,
-            'num_images': len(image_files),
-            'num_changes': len(change_files),
-            'image_files': image_files,
-            'change_files': change_files,
-            'geojson_path': geojson_path
-        })
+        try:
+            results_zip = create_comprehensive_results_package(output_dir, timestamp, {
+                'target_date': target_date,
+                'days_tolerance': days_tolerance,
+                'pipeline_file': geojson_path.name,
+                'num_images': len(image_files),
+                'num_changes': len(change_files),
+                'image_files': image_files,
+                'change_files': change_files,
+                'geojson_path': geojson_path
+            })
+            
+            if results_zip is None:
+                raise Exception("Failed to create results package")
+                
+        except Exception as e:
+            logger.error(f"Results packaging failed: {e}")
+            # Still return results even if packaging fails
+            results_zip = None
         
         logger.info("Analysis completed successfully")
         
@@ -201,17 +210,60 @@ def create_comprehensive_results_package(output_dir, timestamp, analysis_data):
     """Create a comprehensive ZIP file with detailed analysis results."""
     zip_path = RESULTS_FOLDER / f'aquaspot_results_{timestamp}.zip'
     
-    # Create enhanced documentation
-    create_analysis_documentation(output_dir, analysis_data)
+    try:
+        # Create enhanced documentation
+        create_analysis_documentation(output_dir, analysis_data)
+        
+        logger.info(f"Creating ZIP package at {zip_path}")
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED, compresslevel=1) as zipf:  # Fast compression
+            file_count = 0
+            for root, dirs, files in os.walk(output_dir):
+                for file in files:
+                    try:
+                        file_path = Path(root) / file
+                        if file_path.exists() and file_path.stat().st_size > 0:  # Only add non-empty files
+                            arc_name = file_path.relative_to(output_dir)
+                            zipf.write(file_path, arc_name)
+                            file_count += 1
+                            if file_count % 10 == 0:  # Log progress
+                                logger.info(f"Added {file_count} files to ZIP")
+                    except Exception as e:
+                        logger.warning(f"Skipping file {file}: {e}")
+                        continue
+        
+        logger.info(f"ZIP package created successfully with {file_count} files")
+        return zip_path
+        
+    except Exception as e:
+        logger.error(f"Failed to create ZIP package: {e}")
+        # Create a minimal ZIP with just the essential files
+        return create_minimal_results_package(output_dir, timestamp)
+
+def create_minimal_results_package(output_dir, timestamp):
+    """Create a minimal ZIP file with just essential results if full package fails."""
+    zip_path = RESULTS_FOLDER / f'aquaspot_results_{timestamp}.zip'
     
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-        for root, dirs, files in os.walk(output_dir):
-            for file in files:
-                file_path = Path(root) / file
-                arc_name = file_path.relative_to(output_dir)
-                zipf.write(file_path, arc_name)
-    
-    return zip_path
+    try:
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED, compresslevel=1) as zipf:
+            # Add only essential files
+            essential_patterns = ['*.txt', '*.json', '*.log', '*.png', '*.jpg']
+            for pattern in essential_patterns:
+                for file_path in output_dir.glob(pattern):
+                    if file_path.exists():
+                        arc_name = file_path.relative_to(output_dir)
+                        zipf.write(file_path, arc_name)
+            
+            # Add a simple summary
+            summary = f"AquaSpot Analysis Results - {timestamp}\n"
+            summary += "Analysis completed with minimal output due to processing constraints.\n"
+            zipf.writestr("ANALYSIS_SUMMARY.txt", summary)
+        
+        logger.info(f"Minimal ZIP package created: {zip_path}")
+        return zip_path
+        
+    except Exception as e:
+        logger.error(f"Failed to create even minimal ZIP package: {e}")
+        return None
 
 def create_analysis_documentation(output_dir, data):
     """Create comprehensive analysis documentation and reports."""
@@ -857,7 +909,7 @@ def create_field_guidelines(output_dir, data):
                 # Mock coordinates - in real implementation, extract from analysis
                 lat = 33.85 + (i * 0.01)  # Example coordinates
                 lon = -114.65 + (i * 0.01)
-                f.write(f"Anomaly {i+1}: {lat:.6f}, {lon:.6f}\n")
+                f.write(f"Anomaly {i+1}: {lat:.6f}°N, {lon:.6f}°W\n")
                 f.write(f"  Google Maps: https://maps.google.com/?q={lat},{lon}\n")
                 f.write(f"  Priority: HIGH\n\n")
         else:
@@ -1170,7 +1222,7 @@ def create_regulatory_compliance_report(output_dir, data):
         f.write("-" * 40 + "\n")
         f.write("National Response Center: 1-800-424-8802\n")
         f.write("DOT PHMSA 24/7 Hotline: 1-202-366-4595\n")
-        f.write("EPA Emergency Response: 1-800-424-8802\n")
+        f.write("EPA Emergency: 1-800-424-8802\n")
         f.write("State Emergency Services: [Contact local coordinator]\n")
         f.write("Company Emergency Line: [Insert company number]\n\n")
 

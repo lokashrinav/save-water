@@ -23,17 +23,18 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create data directories
-RUN mkdir -p data plots uploads results
+# Create data directories in tmp (ephemeral storage)
+RUN mkdir -p /tmp/data /tmp/plots /tmp/uploads /tmp/results
 
 # Set environment variables
 ENV PYTHONPATH=/app
-ENV DATA_DIR=/app/data
-ENV PLOTS_DIR=/app/plots
+ENV DATA_DIR=/tmp/data
+ENV PLOTS_DIR=/tmp/plots
 ENV FLASK_ENV=production
+ENV PYTHONUNBUFFERED=1
 
 # Expose port for web service (Render will override this)
 EXPOSE 5000
 
-# Use gunicorn for production
-CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120"]
+# Use gunicorn for production with longer timeout for satellite data processing
+CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "600", "--worker-class", "sync", "--max-requests", "100"]
