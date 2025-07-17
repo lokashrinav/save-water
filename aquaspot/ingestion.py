@@ -184,7 +184,29 @@ def _search_sentinel2_imagery(
                 filtered_items.append(item)
         
         logger.debug(f"After cloud cover filtering: {len(filtered_items)} items")
-        return sorted(filtered_items, key=lambda x: abs((datetime.fromisoformat(x.datetime.replace('Z', '+00:00')) - date).days))
+        
+        # Sort by date proximity with more robust date parsing
+        def get_date_diff(item):
+            try:
+                if hasattr(item, 'datetime'):
+                    item_date_str = item.datetime
+                elif hasattr(item, 'properties') and 'datetime' in item.properties:
+                    item_date_str = item.properties['datetime']
+                else:
+                    return float('inf')  # Put items without dates at the end
+                
+                # Handle different datetime formats
+                if item_date_str.endswith('Z'):
+                    item_date_str = item_date_str.replace('Z', '+00:00')
+                
+                item_date = datetime.fromisoformat(item_date_str)
+                diff = abs((item_date - date).total_seconds() / 86400)  # Convert to days
+                return diff
+            except Exception as e:
+                logger.debug(f"Error parsing date for item: {e}")
+                return float('inf')  # Put problematic items at the end
+        
+        return sorted(filtered_items, key=get_date_diff)
         
     except Exception as e:
         logger.error(f"CDSE search failed: {e}")
