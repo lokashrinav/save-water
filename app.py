@@ -206,6 +206,26 @@ def run_analysis(geojson_path, target_date, days_tolerance):
         logger.error(f"Analysis failed: {e}")
         raise
 
+@app.route('/download/<timestamp>')
+def download_results(timestamp):
+    """Download the results ZIP file for a given timestamp."""
+    try:
+        zip_path = RESULTS_FOLDER / f'aquaspot_results_{timestamp}.zip'
+        if zip_path.exists():
+            return send_file(
+                zip_path,
+                as_attachment=True,
+                download_name=f'aquaspot_results_{timestamp}.zip',
+                mimetype='application/zip'
+            )
+        else:
+            flash('Results file not found. It may have been cleaned up.')
+            return redirect(url_for('index'))
+    except Exception as e:
+        logger.error(f"Download error: {e}")
+        flash('Error downloading results file.')
+        return redirect(url_for('index'))
+
 def create_comprehensive_results_package(output_dir, timestamp, analysis_data):
     """Create a comprehensive ZIP file with detailed analysis results."""
     zip_path = RESULTS_FOLDER / f'aquaspot_results_{timestamp}.zip'
@@ -1351,7 +1371,7 @@ def create_trend_analysis(output_dir, data):
         f.write("  □ Continue satellite monitoring\n")
         f.write("  □ Seasonal pattern analysis\n")
         f.write("  □ Preventive maintenance scheduling\n")
-        f.write("  □ Technology enhancement evaluation\n\n")
+               f.write("  □ Technology enhancement evaluation\n\n")
 
 def create_maintenance_recommendations(output_dir, data):
     """Create detailed maintenance recommendations."""
@@ -1508,9 +1528,3 @@ def create_emergency_protocols(output_dir, data):
         f.write("  • Notification compliance: 100%\n")
         f.write("  • Documentation completeness: 100%\n")
         f.write("  • Stakeholder communication: Proactive\n\n")
-
-
-if __name__ == "__main__":
-    # For development only - production uses gunicorn
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=False)
