@@ -49,6 +49,52 @@
             </div>
         </div>
         
+        <!-- Example GeoJSON Section -->
+        <div class="form-group" style="margin-top: 1.5rem;">
+            <div class="example-section">
+                <div class="example-header">
+                    <h4 class="example-title">
+                        <i class="fas fa-lightbulb"></i>
+                        First time? Try our example
+                    </h4>
+                    <p class="example-description">
+                        Download our sample pipeline GeoJSON to see the expected format and test the analysis.
+                    </p>
+                </div>
+                
+                <div class="example-actions">
+                    <a href="{{ url_for('download_example_geojson') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-download"></i>
+                        Download Example
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" id="previewBtn">
+                        <i class="fas fa-eye"></i>
+                        Preview Format
+                    </button>
+                </div>
+                
+                <!-- GeoJSON Preview Modal Content -->
+                <div id="previewContent" class="preview-content d-none">
+                    <div class="preview-header">
+                        <h5>Example GeoJSON Structure</h5>
+                        <button type="button" class="btn-close" id="closePreview">&times;</button>
+                    </div>
+                    <div class="code-preview">
+                        <pre id="geojsonCode">Loading...</pre>
+                    </div>
+                    <div class="preview-footer">
+                        <p><strong>This example shows:</strong></p>
+                        <ul>
+                            <li>A sample gas pipeline in Houston, Texas</li>
+                            <li>Proper LineString geometry for pipeline routes</li>
+                            <li>Pipeline metadata (diameter, material, etc.)</li>
+                            <li>Coordinate format: [longitude, latitude]</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Analysis Window Section -->
         <div class="form-section">
             <h3 class="form-section-title">Analysis Window</h3>
@@ -278,6 +324,39 @@ document.addEventListener('DOMContentLoaded', function() {
     function showHelp() {
         alert('AquaSpot Help:\n\n1. Upload a GeoJSON file containing your pipeline geometry\n2. Set the target date for analysis\n3. Configure analysis parameters\n4. Click "Start Analysis" to begin processing\n\nFor detailed documentation, visit our GitHub repository.');
     }
+    
+    // Example GeoJSON functionality
+    const previewBtn = document.getElementById('previewBtn');
+    const previewContent = document.getElementById('previewContent');
+    const closePreview = document.getElementById('closePreview');
+    const geojsonCode = document.getElementById('geojsonCode');
+    
+    previewBtn.addEventListener('click', function() {
+        if (previewContent.classList.contains('d-none')) {
+            // Show preview
+            fetch('/api/example-geojson')
+                .then(response => response.json())
+                .then(data => {
+                    geojsonCode.textContent = JSON.stringify(data, null, 2);
+                    previewContent.classList.remove('d-none');
+                    previewBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Preview';
+                })
+                .catch(error => {
+                    console.error('Error fetching example:', error);
+                    geojsonCode.textContent = 'Error loading example GeoJSON';
+                    previewContent.classList.remove('d-none');
+                });
+        } else {
+            // Hide preview
+            previewContent.classList.add('d-none');
+            previewBtn.innerHTML = '<i class="fas fa-eye"></i> Preview Format';
+        }
+    });
+    
+    closePreview.addEventListener('click', function() {
+        previewContent.classList.add('d-none');
+        previewBtn.innerHTML = '<i class="fas fa-eye"></i> Preview Format';
+    });
     
     // Add entrance animations
     document.querySelector('.main-content').classList.add('fade-in-up');

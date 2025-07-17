@@ -226,6 +226,41 @@ def download_results(timestamp):
         flash('Error downloading results file.')
         return redirect(url_for('index'))
 
+@app.route('/example-geojson')
+def download_example_geojson():
+    """Download the example GeoJSON file for testing."""
+    try:
+        example_path = Path('demo_pipeline.geojson')
+        if example_path.exists():
+            return send_file(
+                example_path,
+                as_attachment=True,
+                download_name='example_pipeline.geojson',
+                mimetype='application/json'
+            )
+        else:
+            flash('Example file not found.')
+            return redirect(url_for('index'))
+    except Exception as e:
+        logger.error(f"Example download error: {e}")
+        flash('Error downloading example file.')
+        return redirect(url_for('index'))
+
+@app.route('/api/example-geojson')
+def get_example_geojson_content():
+    """Get the content of the example GeoJSON for preview."""
+    try:
+        example_path = Path('demo_pipeline.geojson')
+        if example_path.exists():
+            with open(example_path, 'r') as f:
+                content = json.load(f)
+            return jsonify(content)
+        else:
+            return jsonify({"error": "Example file not found"}), 404
+    except Exception as e:
+        logger.error(f"Example content error: {e}")
+        return jsonify({"error": "Error reading example file"}), 500
+
 def create_comprehensive_results_package(output_dir, timestamp, analysis_data):
     """Create a comprehensive ZIP file with detailed analysis results."""
     zip_path = RESULTS_FOLDER / f'aquaspot_results_{timestamp}.zip'
