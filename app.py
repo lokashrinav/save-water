@@ -104,7 +104,12 @@ def run_analysis(geojson_path, target_date, days_tolerance):
         logger.info(f"Starting analysis for {geojson_path} on {target_date}")
         
         # Step 1: Use CLI to ingest data
-        python_exe = Path.cwd() / '.venv' / 'Scripts' / 'python.exe'
+        # Use system python in production/Docker, fallback to venv for local development
+        if os.environ.get('FLASK_ENV') == 'production':
+            python_exe = 'python'  # Use system python in Docker/production
+        else:
+            python_exe = Path.cwd() / '.venv' / 'Scripts' / 'python.exe'  # Local Windows development
+        
         ingest_cmd = [
             str(python_exe), '-m', 'aquaspot.cli', 'ingest',
             '--geojson', str(geojson_path),
