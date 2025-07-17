@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="main-content">
+    <h2 class="section-title">Pipeline Analysis Configuration</h2>
+    
+    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm">
+        <!-- File Upload Section -->
+        <div class="form-group">
+            <label for="geojson_file" class="form-label">Pipeline Geometry File</label>
+            <div class="file-upload-area" id="fileUploadArea">
+                <input type="file" name="geojson_file" id="geojson_file" class="d-none" accept=".geojson,.json" required>
+                <div id="uploadContent">
+                    <div class="upload-icon">
+                        <i class="fas fa-file-upload"></i>
+                    </div>
+                    <div class="upload-text">Select GeoJSON file or drag and drop</div>
+                    <p class="upload-hint">Supported formats: .geojson, .json (Maximum: 16MB)</p>
+                </div>
+                <div id="fileSelected" class="d-none">
+                    <div class="upload-icon" style="color: var(--success-color);">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="upload-text" id="fileName" style="color: var(--success-color);"></div>
+                    <p class="upload-hint">File ready for processing</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analysis Parameters -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="form-group">
+                    <label for="target_date" class="form-label">Analysis Date</label>
+                    <input type="date" name="target_date" id="target_date" class="form-control" required>
+                    <small class="text-muted">Date for satellite imagery analysis</small>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="days_tolerance" class="form-label">Date Tolerance</label>
+                    <select name="days_tolerance" id="days_tolerance" class="form-select">
+                        <option value="3">3 days</option>
+                        <option value="5" selected>5 days</option>
+                        <option value="7">7 days</option>
+                        <option value="10">10 days</option>
+                    </select>
+                    <small class="text-muted">Acceptable date range for imagery</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Submit Button -->
+        <div class="text-center" style="margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" id="submitBtn">
+                <i class="fas fa-play"></i> Start Analysis
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Process Information -->
+<div class="info-section">
+    <h6>Analysis Process</h6>
+    <ul>
+        <li>Download Sentinel-2 satellite imagery for specified area and timeframe</li>
+        <li>Calculate Normalized Difference Water Index (NDWI) from satellite bands</li>
+        <li>Apply geospatial filtering to focus on pipeline corridor areas</li>
+        <li>Perform temporal change detection to identify potential leak signatures</li>
+        <li>Generate comprehensive analysis report with findings and recommendations</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('geojson_file');
+    const uploadContent = document.getElementById('uploadContent');
+    const fileSelected = document.getElementById('fileSelected');
+    const fileName = document.getElementById('fileName');
+    const submitBtn = document.getElementById('submitBtn');
+    const form = document.getElementById('uploadForm');
+    
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('target_date').value = today;
+    
+    // File upload area click handler
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+    
+    // File input change handler
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileName.textContent = file.name;
+            uploadContent.classList.add('d-none');
+            fileSelected.classList.remove('d-none');
+        }
+    });
+    
+    // Drag and drop handlers
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+    
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+    });
+    
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.name.toLowerCase().endsWith('.geojson') || file.name.toLowerCase().endsWith('.json')) {
+                fileInput.files = files;
+                fileName.textContent = file.name;
+                uploadContent.classList.add('d-none');
+                fileSelected.classList.remove('d-none');
+            } else {
+                alert('Please select a GeoJSON or JSON file.');
+            }
+        }
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', function(e) {
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+        submitBtn.disabled = true;
+    });
+    
+    // Utility classes for d-none
+    const style = document.createElement('style');
+    style.textContent = '.d-none { display: none !important; }';
+    document.head.appendChild(style);
+});
+</script>
+{% endblock %}

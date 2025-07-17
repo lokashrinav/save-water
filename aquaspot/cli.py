@@ -89,15 +89,15 @@ def ingest(
             max_cloud_cover=max_cloud_cover,
         )
         
-        click.echo(f"\n✅ Successfully downloaded {len(downloaded_files)} files:")
+        click.echo(f"\n[SUCCESS] Successfully downloaded {len(downloaded_files)} files:")
         for file_path in downloaded_files:
-            click.echo(f"  📄 {file_path}")
+            click.echo(f"  - {file_path}")
             
-        click.echo(f"\n📁 Files saved to: {out_dir / date.strftime('%Y-%m-%d')}")
+        click.echo(f"\n[INFO] Files saved to: {out_dir / date.strftime('%Y-%m-%d')}")
         
     except Exception as e:
         logger.error(f"Ingestion failed: {e}")
-        click.echo(f"\n❌ Ingestion failed: {e}")
+        click.echo(f"\n[ERROR] Ingestion failed: {e}")
         raise click.ClickException(str(e))
 
 

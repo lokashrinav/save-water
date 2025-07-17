@@ -56,8 +56,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label for="target_date" class="form-label">Target Date</label>
-                        <input type="date" name="target_date" id="target_date" class="form-control" required max="">
-                        <small>Note: Satellite data is available with a 2-3 day delay</small>
+                        <input type="date" name="target_date" id="target_date" class="form-control" required>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -140,17 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressText = document.getElementById('progressText');
     const form = document.getElementById('uploadForm');
     
-    // Set default date to 7 days ago (to ensure satellite data is available)
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    const defaultDate = weekAgo.toISOString().split('T')[0];
-    document.getElementById('target_date').value = defaultDate;
-    
-    // Set max date to 3 days ago (satellite data delay)
-    const threeDaysAgo = new Date();
-    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-    const maxDate = threeDaysAgo.toISOString().split('T')[0];
-    document.getElementById('target_date').max = maxDate;
+    // Set default date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('target_date').value = today;
     
     // File upload area click handler
     fileUploadArea.addEventListener('click', function() {

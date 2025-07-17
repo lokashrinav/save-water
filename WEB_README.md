@@ -1,131 +1,57 @@
-# AquaSpot Web Interface
+# AquaSpot Overview
 
-A simple and user-friendly web interface for the AquaSpot pipeline leak detection system.
+AquaSpot is a leak detection system that analyzes Sentinel-2 satellite imagery to find abnormal increases in surface water near pipelines.
 
-## Features
+## Idea Summary
 
-🌐 **Easy to Use**: Simple drag-and-drop interface for uploading pipeline GeoJSON files  
-🛰️ **Automated Analysis**: Automatically downloads satellite data and runs complete analysis  
-📊 **Visual Results**: Interactive results page with analysis summary  
-📄 **Comprehensive Reports**: Download complete results including PDF reports  
-⚡ **Real-time Processing**: Live status updates during analysis  
+- **Goal**: Provide an accessible tool for utilities and environmental teams to spot potential pipeline leaks before they escalate.
+- **Approach**: Compare satellite images over time using the Normalized Difference Water Index (NDWI) and highlight areas of change.
 
-## Quick Start
+## Project Description
 
-### 1. Install Dependencies
+**What it does**
 
-```bash
-# Install web interface dependencies
-pip install -r requirements-web.txt
+AquaSpot ingests satellite data, calculates NDWI, and reports where sudden water spikes might indicate a leak. Results are available through a command line interface or an easy web interface.
 
-# Or install everything including development dependencies
-pip install -e ".[dev]"
-```
+**Who it helps**
 
-### 2. Configure Environment
+Operators monitoring long pipeline networks and environmental agencies can quickly identify suspicious areas and prioritize inspections.
 
-Make sure you have your `.env` file configured with satellite data access credentials:
+**How it works**
 
-```bash
-cp .env.example .env
-# Edit .env with your Copernicus credentials
-```
+1. Download Sentinel‑2 imagery for the pipeline corridor.
+2. Compute NDWI values to map water presence.
+3. Detect significant changes between baseline and current imagery.
+4. Cluster anomalies and create visual reports.
 
-### 3. Start the Web Server
+**Why it matters**
 
-```bash
-# Easy startup script
-python start_web.py
+Undetected leaks waste resources and damage local ecosystems. AquaSpot offers a scalable way to monitor pipelines remotely and reduce response times.
 
-# Or run directly
-python app.py
-```
+## Setup
 
-### 4. Open in Browser
+1. Install dependencies:
+   ```bash
+   pip install -e .
+   ```
+   For development:
+   ```bash
+   pip install -e ".[dev]"
+   ```
+2. Configure environment variables in `.env` as shown in `README.md`.
+3. Run the web interface:
+   ```bash
+   python start_web.py
+   ```
+   Visit `http://localhost:5000` to upload your pipeline GeoJSON and start analysis.
 
-Navigate to `http://localhost:5000` in your web browser.
+## Tech Stack
 
-## How to Use
-
-1. **Upload Pipeline Data**: Drag and drop your pipeline GeoJSON file
-2. **Select Date**: Choose the target date for leak detection analysis
-3. **Set Parameters**: Configure the date tolerance (3-10 days)
-4. **Start Analysis**: Click "Start Leak Detection Analysis"
-5. **Download Results**: Get complete results package with maps and reports
-
-## Supported File Formats
-
-- **GeoJSON** (.geojson): Standard geospatial data format
-- **JSON** (.json): JSON files with geospatial data
-- **Maximum file size**: 16MB
-
-## Analysis Process
-
-The web interface runs the complete AquaSpot pipeline:
-
-1. **Satellite Data Download**: Retrieves Sentinel-2 imagery for your area and date
-2. **NDWI Calculation**: Computes water content indices
-3. **Pipeline Masking**: Focuses analysis on pipeline corridors
-4. **Change Detection**: Identifies potential leak areas
-5. **Report Generation**: Creates comprehensive PDF reports
-
-## Results Package
-
-Your download will include:
-
-- 📊 **Processed satellite imagery**
-- 🗺️ **NDWI maps and visualizations**
-- 🔍 **Change detection maps**
-- 📄 **Professional PDF report**
-- 📁 **Raw data files for further analysis**
-
-## System Requirements
-
-- **Python**: 3.8 or higher
-- **Memory**: 4GB+ RAM recommended for large areas
-- **Storage**: 1GB+ free space for processing
-- **Internet**: Required for satellite data download
-
-## Troubleshooting
-
-### Analysis Takes Too Long
-- Large pipeline areas may take 10-30 minutes
-- Consider reducing the area size or date tolerance
-- Check your internet connection for satellite data download
-
-### No Satellite Data Found
-- Try increasing the days tolerance (7-10 days)
-- Check if the date is too recent (Sentinel-2 has ~2-5 day delay)
-- Verify your pipeline coordinates are correct
-
-### Upload Fails
-- Ensure file is valid GeoJSON format
-- Check file size is under 16MB
-- Verify file contains valid coordinate data
-
-## Security Notes
-
-- Files are processed locally on your server
-- Uploaded files are automatically cleaned up after processing
-- No data is sent to external services except for satellite data download
-
-## Production Deployment
-
-For production use:
-
-1. Set `FLASK_ENV=production`
-2. Use a proper WSGI server (gunicorn, uWSGI)
-3. Configure reverse proxy (nginx, Apache)
-4. Set up proper logging and monitoring
-5. Configure file upload limits and security
-
-## API Endpoints
-
-- `GET /`: Main upload interface
-- `POST /upload`: File upload and analysis trigger
-- `GET /download/<timestamp>`: Download results
-- `GET /api/status`: Service status check
+- **Python 3.11**
+- **Rasterio** and **Shapely** for geospatial processing
+- **Geopandas**, **numpy**, and **pandas** for data analysis
+- **Flask** and **Streamlit** provide web and CLI interfaces
+- **WeasyPrint** generates PDF reports
 
 ---
-
-**Need Help?** Check the main [AquaSpot documentation](README.md) or create an issue on GitHub.
+See `README.md` for full documentation and advanced usage.

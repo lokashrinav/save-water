@@ -16,24 +16,24 @@ ENV GDAL_CONFIG=/usr/bin/gdal-config
 ENV CPLUS_INCLUDE_PATH=/usr/include/gdal
 ENV C_INCLUDE_PATH=/usr/include/gdal
 
-# Copy requirements and install Python dependencies
-COPY pyproject.toml .
-RUN pip install --no-cache-dir -e .
+# Copy all source code first
+COPY . .
 
-# Copy application code
-COPY aquaspot/ ./aquaspot/
-COPY README.md .
+# Install Python dependencies
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Create data directories
-RUN mkdir -p data plots
+RUN mkdir -p data plots uploads results
 
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV DATA_DIR=/app/data
 ENV PLOTS_DIR=/app/plots
+ENV FLASK_ENV=production
 
-# Expose port for Streamlit (if running web interface)
-EXPOSE 8501
+# Expose port for web service (Render will override this)
+EXPOSE 5000
 
-# Default command
-CMD ["python", "-m", "aquaspot.cli", "--help"]
+# Use gunicorn for production
+CMD ["gunicorn", "wsgi:app", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "120"]

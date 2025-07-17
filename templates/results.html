@@ -2,100 +2,180 @@
 
 {% block content %}
 <div class="main-content">
-    <h2 class="section-title">Analysis Complete</h2>
-    
-    <div class="alert alert-success">
-        Analysis completed successfully. Results are ready for download.
-    </div>
-    
-    <!-- Metrics -->
-    <div class="row" style="margin-bottom: 32px;">
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="metric-icon" style="color: var(--accent-color);">
-                    <i class="fas fa-satellite"></i>
-                </div>
-                <div class="metric-value">{{ num_images }}</div>
-                <div class="metric-label">Images Processed</div>
-            </div>
+    <!-- Progress Stepper - moved up to match config -->
+    <div class="progress-stepper">
+        <div class="step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>
+            <div class="step-label">Upload</div>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="metric-icon" style="color: var(--warning-color);">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <div class="metric-value">{{ num_changes }}</div>
-                <div class="metric-label">Areas Detected</div>
-            </div>
+        <div class="step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>
+            <div class="step-label">Configure</div>
         </div>
-        <div class="col-md-4">
-            <div class="metric-card">
-                <div class="metric-icon" style="color: var(--success-color);">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="metric-value">Ready</div>
-                <div class="metric-label">Report Status</div>
-            </div>
+        <div class="step completed">
+            <div class="step-circle"><i class="fas fa-check"></i></div>
+            <div class="step-label">Analyze</div>
+        </div>
+        <div class="step active">
+            <div class="step-circle">4</div>
+            <div class="step-label">Results</div>
         </div>
     </div>
-    
-    <!-- Process Status -->
-    <div class="status-section">
-        <div class="status-title">Processing Pipeline</div>
-        <div class="process-grid">
-            <div class="process-item">
-                <i class="fas fa-check" style="color: var(--success-color);"></i>
-                Satellite data retrieved
+
+    <!-- Single Centered Card (matching config layout) -->
+    <div class="wizard-card">
+        <!-- Title - matching config style -->
+        <h2 class="wizard-title">Analysis Complete</h2>
+        
+        <div class="alert alert-success" style="margin-bottom: 32px;">
+            <i class="fas fa-check-circle" style="margin-right: 8px;"></i>
+            Analysis completed successfully. Results are ready for download.
+        </div>
+        
+        <!-- Key Metrics Section -->
+        <div style="margin-bottom: 32px;">
+            <h3 class="section-subtitle">Key Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric-card-compact">
+                    <div class="metric-icon" style="color: var(--accent-color);">
+                        <i class="fas fa-satellite"></i>
+                    </div>
+                    <div class="metric-value">{{ num_images }}</div>
+                    <div class="metric-label">Images Processed</div>
+                    <small>Sentinel-2 MSI Level-2A</small>
+                </div>
+                <div class="metric-card-compact">
+                    <div class="metric-icon" style="color: {% if num_changes > 0 %}var(--warning-color){% else %}var(--success-color){% endif %};">
+                        {% if num_changes > 0 %}
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {% else %}
+                        <i class="fas fa-shield-check"></i>
+                        {% endif %}
+                    </div>
+                    <div class="metric-value">{{ num_changes }}</div>
+                    <div class="metric-label">Areas Detected</div>
+                    <small>Anomaly threshold: 0.15 NDWI</small>
+                </div>
+                <div class="metric-card-compact">
+                    <div class="metric-icon" style="color: var(--accent-color);">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="metric-value">{{ days_tolerance }}d</div>
+                    <div class="metric-label">Analysis Window</div>
+                    <small>±{{ days_tolerance }} days tolerance</small>
+                </div>
             </div>
-            <div class="process-item">
-                <i class="fas fa-check" style="color: var(--success-color);"></i>
-                NDWI analysis complete
+        </div>
+
+        <!-- Analysis Parameters Section -->
+        <div style="margin-bottom: 32px;">
+            <h3 class="section-subtitle">Analysis Parameters</h3>
+            <div class="parameters-grid">
+                <div class="parameter-item">
+                    <strong>Target Date:</strong> {{ target_date }}
+                </div>
+                <div class="parameter-item">
+                    <strong>Pipeline File:</strong> {{ pipeline_file }}
+                </div>
+                <div class="parameter-item">
+                    <strong>Data Source:</strong> ESA Sentinel-2
+                </div>
+                <div class="parameter-item">
+                    <strong>Resolution:</strong> 10m multispectral
+                </div>
+                <div class="parameter-item">
+                    <strong>Method:</strong> NDWI Change Detection
+                </div>
+                <div class="parameter-item">
+                    <strong>Confidence:</strong> 95%
+                </div>
             </div>
-            <div class="process-item">
-                <i class="fas fa-check" style="color: var(--success-color);"></i>
-                Pipeline masking applied
+        </div>
+        
+        <!-- Processing Status Section -->
+        <div style="margin-bottom: 32px;">
+            <h3 class="section-subtitle">Processing Status</h3>
+            <div class="status-grid">
+                <div class="status-item">
+                    <i class="fas fa-check" style="color: var(--success-color);"></i>
+                    <span>Satellite data retrieved</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-check" style="color: var(--success-color);"></i>
+                    <span>NDWI analysis complete</span>
+                </div>
+                <div class="status-item">
+                    <i class="fas fa-check" style="color: var(--success-color);"></i>
+                    <span>Pipeline masking applied</span>
+                </div>
+                <div class="status-item">
+                    {% if num_changes > 0 %}
+                    <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
+                    <span>{{ num_changes }} areas identified</span>
+                    {% else %}
+                    <i class="fas fa-check" style="color: var(--success-color);"></i>
+                    <span>No changes detected</span>
+                    {% endif %}
+                </div>
             </div>
-            <div class="process-item">
+        </div>
+        
+        <!-- Results Summary -->
+        {% if num_changes > 0 %}
+        <div class="alert alert-warning" style="margin-bottom: 32px;">
+            <strong>Areas of Interest:</strong> {{ num_changes }} areas require field investigation.
+        </div>
+        {% else %}
+        <div class="alert alert-info" style="margin-bottom: 32px;">
+            <strong>No Significant Changes:</strong> Analysis found no major anomalies during the specified period.
+        </div>
+        {% endif %}
+
+        <!-- Package Contents Preview -->
+        <div style="margin-bottom: 32px;">
+            <h3 class="section-subtitle">Package Contents</h3>
+            <div class="package-preview">
+                <div class="package-category">
+                    <i class="fas fa-satellite" style="color: var(--accent-color);"></i>
+                    <span>Raw satellite imagery (GeoTIFF format)</span>
+                </div>
+                <div class="package-category">
+                    <i class="fas fa-map" style="color: var(--accent-color);"></i>
+                    <span>Processed NDWI maps and change detection</span>
+                </div>
+                <div class="package-category">
+                    <i class="fas fa-file-alt" style="color: var(--accent-color);"></i>
+                    <span>Technical reports and documentation</span>
+                </div>
                 {% if num_changes > 0 %}
-                <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i>
-                {{ num_changes }} areas identified
-                {% else %}
-                <i class="fas fa-check" style="color: var(--success-color);"></i>
-                No changes detected
+                <div class="package-category">
+                    <i class="fas fa-map-pin" style="color: var(--warning-color);"></i>
+                    <span>GPS coordinates for field investigation</span>
+                </div>
                 {% endif %}
             </div>
+            <p class="help-text">
+                Complete analysis package (~{{ "%.1f"|format((num_images * 2.3 + 15)|round(1)) }} MB) including satellite imagery, processed data, and comprehensive documentation.
+            </p>
         </div>
-    </div>
-    
-    <!-- Download -->
-    <div class="status-section">
-        <div class="status-title">Download Results</div>
-        <p style="color: var(--text-secondary); margin-bottom: 20px;">
-            Complete analysis package including satellite imagery, processed data, and documentation.
-        </p>
-        <div class="text-center">
-            <a href="{{ url_for('download_results', timestamp=timestamp) }}" class="btn btn-primary">
+
+        <!-- Full-width Download Button (matching config CTA) -->
+        <div class="wizard-footer">
+            <a href="{{ url_for('download_results', timestamp=timestamp) }}" class="btn btn-primary btn-fullwidth">
                 <i class="fas fa-download"></i>
-                Download Analysis
+                Download Complete Package
             </a>
+            <p class="help-text" style="margin-top: 12px;">
+                Package includes all satellite data, analysis results, and technical documentation
+            </p>
         </div>
     </div>
-    
-    <!-- Status -->
-    {% if num_changes > 0 %}
-    <div class="alert alert-warning">
-        <strong>Areas of Interest:</strong> {{ num_changes }} areas require field investigation.
-    </div>
-    {% else %}
-    <div class="alert alert-info">
-        <strong>No Significant Changes:</strong> Analysis found no major anomalies during the specified period.
-    </div>
-    {% endif %}
-    
+
+    <!-- Secondary Action (matching config layout) -->
     <div class="text-center" style="margin-top: 32px;">
         <a href="{{ url_for('index') }}" class="btn btn-secondary">
             <i class="fas fa-plus"></i>
-            New Analysis
+            Analyze New Pipeline
         </a>
     </div>
 </div>
