@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: aquaspot-web
+    env: python
+    region: oregon # or your preferred region
+    plan: free # or starter/standard for better performance
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      # Set up the package structure
+      export PYTHONPATH="${PYTHONPATH}:/opt/render/project/src"
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --preload
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONPATH
+        value: /opt/render/project/src
+      - key: DATA_DIR
+        value: /tmp/data
+      - key: PLOTS_DIR
+        value: /tmp/plots
+      - key: STAC_API_URL
+        value: https://catalogue.dataspace.copernicus.eu/stac
+      - key: CDSE_BASE_URL
+        value: https://catalogue.dataspace.copernicus.eu
+      # Add your secrets via Render dashboard:
+      # - CDSE_CLIENT_ID (recommended for authenticated downloads)
+      # - CDSE_CLIENT_SECRET (recommended for authenticated downloads)
+      # Legacy options:
+      # - COPERNICUS_USERNAME
+      # - COPERNICUS_PASSWORD  
+      # Optional:
+      # - SMTP_SERVER (optional)
+      # - SMTP_PORT (optional)
+      # - SMTP_USERNAME (optional)
+      # - SMTP_PASSWORD (optional)
+    autoDeploy: true
+    healthCheckPath: /health
